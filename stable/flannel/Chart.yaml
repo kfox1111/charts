@@ -1,0 +1,13 @@
+name: flannel
+version: 0.7.0
+description: flannel is a network fabric for containers, designed for Kubernetes
+keywords:
+- flannel
+- sdn
+home: https://github.com/coreos/flannel/
+sources:
+  - https://github.com/coreos/flannel/
+maintainers:
+- name: Kevin Fox
+  email: kevin@efox.cc
+engine: gotpl
