@@ -2,10 +2,12 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: kube-flannel-cfg
+  name: {{ template "fullname" . }}
   labels:
-    tier: node
-    app: flannel
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: "{{ template "fullname" . }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
 data:
   cni-conf.json: |
     {
@@ -26,16 +28,20 @@ data:
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: kube-flannel-ds
+  name: {{ template "fullname" . }}
   labels:
-    tier: node
-    app: flannel
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: "{{ template "fullname" . }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
 spec:
   template:
     metadata:
       labels:
-        tier: node
-        app: flannel
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: "{{ template "fullname" . }}"
+        heritage: "{{ .Release.Service }}"
+        release: "{{ .Release.Name }}"
     spec:
       hostNetwork: true
     {{- if .Values.nodeSelector }}
@@ -51,9 +57,13 @@ spec:
         {{- end }}
 {{ toYaml .Values.tolerations.extra | indent 8 }}
     {{- end }}
+      {{- if .Values.serviceAccount.name }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
+      {{- else }}
+      serviceAccountName: {{ template "fullname" . }}
+      {{- end }}
       containers:
-      - name: kube-flannel
+      - name: main
         image: "{{ .Values.image.repo }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
@@ -102,4 +112,4 @@ spec:
             path: /etc/cni/net.d
         - name: flannel-cfg
           configMap:
-            name: kube-flannel-cfg
+            name: {{ template "fullname" . }}
