@@ -42,10 +42,15 @@ spec:
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
     {{- end }}
+    {{- if or .Values.tolerations.extra .Values.tolerations.defaults }}
       tolerations:
-      - key: node-role.kubernetes.io/master
-        operator: Exists
-        effect: NoSchedule
+        {{- if .Values.tolerations.default }}
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        {{- end }}
+{{ toYaml .Values.tolerations.extra | indent 8 }}
+    {{- end }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
       - name: kube-flannel

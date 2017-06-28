@@ -19,3 +19,6 @@ args:
 nodeSelector:
   beta.kubernetes.io/arch: amd64
 
+tolerations:
+  defaults: true
+  #extra: []
