@@ -1,9 +1,4 @@
 ---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: flannel
----
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -49,12 +44,33 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      serviceAccountName: flannel
+      serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
       - name: kube-flannel
         image: "{{ .Values.image.repo }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: [ "/opt/bin/flanneld", "--ip-masq", "--kube-subnet-mgr" ]
+        command:
+        - "/opt/bin/flanneld"
+        {{- range $key, $value := .Values.args }}
+        {{- $tp := typeOf $value }}
+        {{- if eq $tp "bool" }}
+        {{- if eq $value true }}
+        - --{{ $key }}
+        {{- end }}
+        {{- else }}
+        - --{{ $key }}={{ $value }}
+        {{- end }}
+        {{- end }}
+        {{- range $key, $value := .Values.extraArgs }}
+        {{- $tp := typeOf $value }}
+        {{- if eq $tp "bool" }}
+        {{- if eq $value true }}
+        - --{{ $key }}
+        {{- end }}
+        {{- else }}
+        - --{{ $key }}={{ $value }}
+        {{- end }}
+        {{- end }}
         securityContext:
           privileged: true
         env:
