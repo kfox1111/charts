@@ -38,8 +38,10 @@ spec:
         app: flannel
     spec:
       hostNetwork: true
+    {{- if .Values.nodeSelector }}
       nodeSelector:
-        beta.kubernetes.io/arch: amd64
+{{ toYaml .Values.nodeSelector | indent 8 }}
+    {{- end }}
       tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
@@ -52,16 +54,6 @@ spec:
         command:
         - "/opt/bin/flanneld"
         {{- range $key, $value := .Values.args }}
-        {{- $tp := typeOf $value }}
-        {{- if eq $tp "bool" }}
-        {{- if eq $value true }}
-        - --{{ $key }}
-        {{- end }}
-        {{- else }}
-        - --{{ $key }}={{ $value }}
-        {{- end }}
-        {{- end }}
-        {{- range $key, $value := .Values.extraArgs }}
         {{- $tp := typeOf $value }}
         {{- if eq $tp "bool" }}
         {{- if eq $value true }}

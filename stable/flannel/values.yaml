@@ -15,5 +15,7 @@ rbac:
 args:
   "ip-masq": true
   "kube-subnet-mgr": true
-extraArgs: {}
+
+nodeSelector:
+  beta.kubernetes.io/arch: amd64
 
