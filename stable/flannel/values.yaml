@@ -4,6 +4,7 @@ image:
   pullPolicy: IfNotPresent
 
 subnet: 10.244.0.0/16
+port: 8472
 
 serviceAccount:
   enabled: true
