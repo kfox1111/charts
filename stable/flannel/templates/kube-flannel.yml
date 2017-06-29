@@ -22,7 +22,7 @@ data:
       "Network": {{ .Values.subnet | quote }},
       "Backend": {
         {{- if .Values.port }}
-        "Port": {{ .Values.port | quote }},
+        "Port": {{ .Values.port }},
         {{- end }}
         "Type": "vxlan"
       }
