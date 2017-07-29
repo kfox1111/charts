@@ -1,0 +1,17 @@
+{{- $local := dict "first" true }}
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: {{ .Values.type }}
+provisioner: {{ printf "ceph.com/%s" .Values.type | quote }}
+parameters:
+  monitors: {{- range .Values.monitors }}{{- if not $local.first }},{{ end }}{{ . }}{{ end }}
+  pool: {{ .Values.pool }}
+  adminId: {{ .Values.adminSecret.user }}
+  adminSecretNamespace: {{ .Release.Namespace }}
+{{- if eq .Values.type "rbd" }}
+  userId: {{ .Values.userSecret.user }}
+  userSecretName: {{ .Values.userSecret.name }}
+  imageFormat: {{ .Values.imageFormat | quote }}
+  imageFeatures: {{ .Values.imageFeatures }}
+{{- end }}

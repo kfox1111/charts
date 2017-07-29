@@ -1,0 +1,47 @@
+# Default values for ceph-provisioner.
+# This is a YAML-formatted file.
+# Declare name/value pairs to be passed into your templates.
+# name: value
+
+# The e2e tests do not support ceph or using alternate options
+# so this has to be defaulted to false. You must set enabled
+# to true to use this chart.
+enabled: false
+
+# Set this to either rbd or cephfs. 
+type: rbd
+
+rbd:
+  image: quay.io/external_storage/rbd-provisioner
+  imageTag: v0.1.0
+
+cephfs:
+  image: quay.io/external_storage/cephfs-provisioner
+  imageTag: v0.1.0
+
+imagePullPolicy: "IfNotPresent"
+replicaCount: 1
+
+nodeSelector: {}
+
+adminSecret:
+  manage: true
+  unwrapped: true
+  filename: key
+  name: ceph-rbd-admin
+  user: admin
+  key: xxxxx
+
+userSecret:
+  manage: true
+  unwrapped: true
+  filename: key
+  name: ceph-rbd-user
+  user: kube
+  key: yyyyy
+
+resources: {}
+
+pool: kube
+imageFormat: "2"
+imageFeatures: layering

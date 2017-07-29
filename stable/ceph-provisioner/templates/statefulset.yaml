@@ -1,0 +1,38 @@
+{{- if .Values.enabled }}
+{{- $typeConfig := pluck .Values.type .Values | first }}
+{{- $image := $typeConfig.image }}
+{{- $imageTag := $typeConfig.imageTag }}
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "name" . }}
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  serviceName: {{ template "fullname" . }}
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "name" . }}
+        release: "{{ .Release.Name }}"
+      annotations:
+{{ toYaml .Values.annotations | indent 8 }}
+    spec:
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 10 }}
+      containers:
+      - name: {{ template "fullname" . }}
+        image: "{{ $image }}:{{ $imageTag }}"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+#FIXME args
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        ports:
+#FIXME
+        - containerPort: 9128
+          name: http
+{{- end }}

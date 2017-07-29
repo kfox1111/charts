@@ -1,0 +1,15 @@
+name: ceph-provisioner
+version: 1.0.0
+appVersion: 0.1.0
+description: ceph dynamic volume provisioner
+keywords:
+- ceph
+- dynamic
+- volume
+- provisioner
+- cephfs
+- rbd
+maintainers:
+  - name: kfox1111
+    email: Kevin.Fox@pnnl.gov
+icon: https://upload.wikimedia.org/wikipedia/en/a/aa/Ceph_logo.png

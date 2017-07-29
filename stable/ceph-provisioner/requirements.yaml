@@ -1,0 +1,11 @@
+dependencies:
+  - name: ceph-secret
+    repository: file://../ceph-secret
+    alias: userSecret
+    version: 1.0.0
+    condition: secret.manage
+  - name: ceph-secret
+    repository: file://../ceph-secret
+    alias: adminSecret
+    version: 1.0.0
+    condition: adminSecret.manage

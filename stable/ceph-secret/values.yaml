@@ -1,0 +1,16 @@
+# Name of the configmap.
+name: admin
+
+# Name of the Ceph user
+user: admin
+
+# The Ceph user's key.
+key: xxxxxxxxxxxx=
+
+# Override the filename in the secret
+#filename: ceph.client.foo.keyring
+
+# Only store the key instead of using
+# the keystab format. Needed by some
+# kubernetes tools.
+unwrapped: false
