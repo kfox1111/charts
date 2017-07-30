@@ -1,4 +1,3 @@
-{{- if .Values.enabled }}
 {{- $typeConfig := pluck .Values.type .Values | first }}
 {{- $image := $typeConfig.image }}
 {{- $imageTag := $typeConfig.imageTag }}
@@ -35,4 +34,3 @@ spec:
 #FIXME
         - containerPort: 9128
           name: http
-{{- end }}
