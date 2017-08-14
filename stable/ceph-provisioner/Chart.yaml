@@ -1,6 +1,6 @@
 name: ceph-provisioner
 version: 1.0.0
-appVersion: 0.1.0
+appVersion: 0.1.1
 description: ceph dynamic volume provisioner
 keywords:
 - ceph

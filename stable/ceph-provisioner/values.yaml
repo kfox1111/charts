@@ -8,11 +8,11 @@ type: rbd
 
 rbd:
   image: quay.io/external_storage/rbd-provisioner
-  imageTag: v0.1.0
+  imageTag: v0.1.1
 
 cephfs:
   image: quay.io/external_storage/cephfs-provisioner
-  imageTag: v0.1.0
+  imageTag: v0.1.1
 
 imagePullPolicy: "IfNotPresent"
 replicaCount: 1
