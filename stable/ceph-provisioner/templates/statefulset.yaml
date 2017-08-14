@@ -27,10 +27,5 @@ spec:
       - name: {{ template "fullname" . }}
         image: "{{ $image }}:{{ $imageTag }}"
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-#FIXME args
         resources:
 {{ toYaml .Values.resources | indent 10 }}
-        ports:
-#FIXME
-        - containerPort: 9128
-          name: http
