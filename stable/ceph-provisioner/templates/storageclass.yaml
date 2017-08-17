@@ -8,6 +8,7 @@ parameters:
   monitors: {{- range .Values.monitors }}{{- if not $local.first }},{{ end }}{{ . }}{{ end }}
   pool: {{ .Values.pool }}
   adminId: {{ .Values.adminSecret.user }}
+  adminSecretName: {{ .Values.adminSecret.name }}
   adminSecretNamespace: {{ .Release.Namespace }}
 {{- if eq .Values.type "rbd" }}
   userId: {{ .Values.userSecret.user }}
