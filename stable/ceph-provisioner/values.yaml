@@ -6,6 +6,12 @@
 # Set this to either rbd or cephfs. 
 type: rbd
 
+#You must set this to the list of your monitors.
+monitors: []
+# - monitor1
+# - monitor2
+# - monitor3
+
 rbd:
   image: quay.io/external_storage/rbd-provisioner
   imageTag: v0.1.1
