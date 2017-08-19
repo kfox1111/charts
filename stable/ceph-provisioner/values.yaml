@@ -41,6 +41,9 @@ userSecret:
   user: kube
   key: yyyyy
 
+args: []
+# - -v 255
+
 resources: {}
 
 pool: kube
