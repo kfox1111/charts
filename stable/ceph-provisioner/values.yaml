@@ -23,6 +23,7 @@ cephfs:
 imagePullPolicy: "IfNotPresent"
 replicaCount: 1
 
+hostNetwork: true
 nodeSelector: {}
 
 adminSecret:
@@ -42,7 +43,7 @@ userSecret:
   key: yyyyy
 
 args: []
-# - -v 255
+# - -v 10
 
 resources: {}
 
