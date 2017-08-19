@@ -3,7 +3,7 @@ dependencies:
     repository: file://../ceph-secret
     alias: userSecret
     version: 1.0.0
-    condition: secret.manage
+    condition: userSecret.manage
   - name: ceph-secret
     repository: file://../ceph-secret
     alias: adminSecret

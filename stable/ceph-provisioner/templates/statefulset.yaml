@@ -21,11 +21,14 @@ spec:
       annotations:
 {{ toYaml .Values.annotations | indent 8 }}
     spec:
+      hostNetwork: {{ .Values.hostNetwork }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 10 }}
       containers:
       - name: {{ template "fullname" . }}
         image: "{{ $image }}:{{ $imageTag }}"
         imagePullPolicy: {{ .Values.imagePullPolicy }}
+        args:
+{{ toYaml .Values.args | indent 10 }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
