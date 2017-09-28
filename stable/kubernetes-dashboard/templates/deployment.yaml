@@ -28,7 +28,28 @@ spec:
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 10 }}
       containers:
+{{- if eq .Values.oidc.enabled true }}
+      - name: oidcproxy
+        image: "{{ .Values.oidc.image }}:{{ .Values.oidc.imageTag }}"
+        imagePullPolicy: {{ .Values.oidc.imagePullPolicy }}
+        args:
+{{ toYaml .Values.oidc.args | indent 10 }}
+        volumeMounts:
+        - mountPath: /etc/oidc-ca.pem
+          subPath: {{ .Values.oidc.ca.key | quote }}
+          name: oidc-ca
+{{- end }}
       - name: main
+        args:
+{{- if eq .Values.oidc.enabled true }}
+          - --bind-address
+          - 127.0.0.1
+          - --insecure-port
+          - "5557"
+{{- end }}
+          {{- range $arg := .Values.args }}
+          - {{ $arg | quote }}
+          {{- end }}
         image: "{{ .Values.image }}:{{ .Values.imageTag }}"
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         resources:
@@ -47,3 +68,9 @@ spec:
         - name: http
           containerPort: 9090
           protocol: TCP
+{{- if eq .Values.oidc.enabled true }}
+      volumes:
+      - name: oidc-ca
+        configMap:
+          name: {{ .Values.oidc.ca.configmap | quote }}
+{{- end }}

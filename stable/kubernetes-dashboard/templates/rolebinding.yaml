@@ -1,6 +1,10 @@
 {{- if .Values.rbac.create }}
 apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- if .Values.rbac.authenticated }}
+kind: RoleBinding
+{{- else }}
 kind: ClusterRoleBinding
+{{- end }}
 metadata:
   labels:
     app: {{ template "kubernetes-dashboard.name" . }}
@@ -10,8 +14,13 @@ metadata:
   name: {{ template "kubernetes-dashboard.fullname" . }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
+{{- if .Values.rbac.authenticated }}
+  kind: Role
+  name: {{ template "kubernetes-dashboard.fullname" . }}
+{{- else }}
   kind: ClusterRole
   name: cluster-admin
+{{- end }}
 subjects:
   - kind: ServiceAccount
     name: {{ template "kubernetes-dashboard.fullname" . }}

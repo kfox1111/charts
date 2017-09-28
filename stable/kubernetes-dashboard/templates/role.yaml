@@ -1,0 +1,28 @@
+{{- if .Values.rbac.create }}
+{{- if .Values.rbac.authenticated }}
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  labels:
+    app: {{ template "kubernetes-dashboard.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "kubernetes-dashboard.fullname" . }}
+rules:
+    # Allow Dashboard to create and watch for changes of 'kubernetes-dashboard-key-holder' secret.
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create", "watch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    # Allow Dashboard to get, update and delete 'kubernetes-dashboard-key-holder' and 'kubernetes-dashboard-certs' secrets.
+    resourceNames: ["kubernetes-dashboard-key-holder", "kubernetes-dashboard-certs"]
+    verbs: ["get", "update", "delete"]
+    # Allow Dashboard to get metrics from heapster.
+  - apiGroups: [""]
+    resources: ["services"]
+    resourceNames: ["heapster"]
+    verbs: ["proxy"]
+{{- end }}
+{{- end }}

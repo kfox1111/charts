@@ -4,14 +4,51 @@
 # name: value
 
 image: gcr.io/google_containers/kubernetes-dashboard-amd64
-imageTag: "v1.6.3"
+imageTag: "v1.7.0"
 imagePullPolicy: "IfNotPresent"
+
+inMiniKube: false
 
 nodeSelector: {}
 
 httpPort: 80
 
 serviceType: ClusterIP
+
+externalIPs: []
+
+oidc:
+  enabled: false
+  image: kfox1111/oauth2_proxy
+  imageTag: "latest"
+  imagePullPolicy: "IfNotPresent"
+  ca:
+    configmap: oidc-ca
+    key: ca.pem
+  args: []
+#    - -http-address
+#    - 0.0.0.0:9090
+#    - -client-id 
+#    - kubernetes
+#    - -client-secret
+#    - xxxxxxxxxxxxxxxxxxxxxxxx
+#    - -pass-access-token
+#    - -redirect-url
+#    - http://192.168.42.219:31850/oauth2/callback
+#    - -cookie-secret
+#    - yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+#    - -upstream
+#    - http://127.0.0.1:5557
+#    - -email-domain
+#    - "*"
+#    - -provider
+#    - oidc
+#    - -oidc-issuer-url
+#    - https://192.168.42.219:5556
+#    - -skip-provider-button
+#    - -cookie-secure=false
+#    - -ssl-insecure-skip-verify
+args: []
 
 resources:
   limits:
@@ -49,7 +86,8 @@ ingress:
 rbac:
   ## If true, create & use RBAC resources
   #
-  create: false
+  create: true
+  authenticated: true
 
   ## Ignored if rbac.create is true
   #
