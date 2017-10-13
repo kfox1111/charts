@@ -22,7 +22,8 @@ oidc:
   image: kfox1111/oauth2_proxy
   imageTag: "latest"
   imagePullPolicy: "IfNotPresent"
-  ca:
+  selfSignedCA:
+    enabled: true
     configmap: oidc-ca
     key: ca.pem
   args: []

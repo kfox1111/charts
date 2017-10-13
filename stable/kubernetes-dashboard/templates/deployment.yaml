@@ -34,10 +34,12 @@ spec:
         imagePullPolicy: {{ .Values.oidc.imagePullPolicy }}
         args:
 {{ toYaml .Values.oidc.args | indent 10 }}
+{{- if eq .Values.oidc.selfSignedCA.enabled true }}
         volumeMounts:
         - mountPath: /etc/oidc-ca.pem
-          subPath: {{ .Values.oidc.ca.key | quote }}
+          subPath: {{ .Values.oidc.selfSignedCA.key | quote }}
           name: oidc-ca
+{{- end }}
 {{- end }}
       - name: main
         args:
@@ -69,8 +71,10 @@ spec:
           containerPort: 9090
           protocol: TCP
 {{- if eq .Values.oidc.enabled true }}
+{{- if eq .Values.oidc.selfSignedCA.enabled true }}
       volumes:
       - name: oidc-ca
         configMap:
-          name: {{ .Values.oidc.ca.configmap | quote }}
+          name: {{ .Values.oidc.selfSignedCA.configmap | quote }}
+{{- end }}
 {{- end }}

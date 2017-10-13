@@ -54,7 +54,7 @@ httpPort: 9090
 serviceType: NodePort
 oidc:
   enabled: true
-  ca:
+  selfSignedCA:
     configmap: dex-dex-ca
     key: dex-ca.pem
   args:
