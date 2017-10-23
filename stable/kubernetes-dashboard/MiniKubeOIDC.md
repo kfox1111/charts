@@ -1,6 +1,6 @@
 # Minikube + OIDC Dashboard
 
-This document describes how to launch a test Kubernetes system that has the dashboard secured by
+This document describes how to launch a test Kubernetes system that has the dashboard and cli secured by
 OIDC via DEX.
 
 # Install dependencies
@@ -15,7 +15,8 @@ Ctrl-C the watch once tiller is no longer unresponsive.
 which docker-machine-driver-kvm >/dev/null 2>&1 && EXTRARGS=--vm-driver=kvm
 minikube start $EXTRARGS
 COOKIESECRET=$(openssl rand -base64 32 | cut -c -32)
-CLIENTPW=$(openssl rand -hex 11)
+CLIENTDBPW=$(openssl rand -hex 11)
+CLIENTCLIPW=$(openssl rand -hex 11)
 MINIKUBEIP=$(minikube ip)
 
 cat > dex-minikube-values.yaml <<EOF
@@ -30,13 +31,21 @@ config:
   oauth2:
     skipApprovalScreen: true
   staticClients:
-  - id: kubernetes
+  - id: kubernetes-dashboard
     redirectURIs:
     - 'http://$MINIKUBEIP:9090/oauth2/callback'
+    name: 'Kubernetes Dashboard'
+    secret: $CLIENTDBPW
+  - id: kubernetes
     name: 'Kubernetes Cluster'
-    secret: $CLIENTPW
+    secret: $CLIENTCLIPW
+    public: true
+    trustedPeers:
+      - kubernetes-dashboard
 EOF
 cat >> dex-minikube-values.yaml <<"EOF"
+  logger:
+    level: debug
   enablePasswordDB: true
   staticPasswords:
   - email: "admin@example.com"
@@ -61,9 +70,11 @@ oidc:
     - -http-address
     - 0.0.0.0:9090
     - -client-id 
+    - kubernetes-dashboard
+    - -audience-client-id 
     - kubernetes
     - -client-secret
-    - "$CLIENTPW"
+    - "$CLIENTDBPW"
     - -pass-access-token
     - -redirect-url
     - http://$MINIKUBEIP:9090/oauth2/callback
@@ -80,6 +91,7 @@ oidc:
     - -ssl-insecure-skip-verify
     - -skip-provider-button
     - -cookie-secure=false
+    - -scope=openid profile email groups audience:server:client_id:kubernetes
 EOF
 
 kubectl -n kube-system create sa tiller
@@ -136,3 +148,24 @@ minikube dashboard
 ```console
 kubectl create clusterrolebinding admin@example.com --clusterrole cluster-admin --user admin@example.com
 ```
+
+# CLI:
+
+*NOTE* The CLI support needs an unreleased PR applied to work properly. This needs to wait until the following PR merges:
+https://github.com/kubernetes/kubernetes/pull/54421
+
+Fetch an authorization code for your user:
+```console
+firefox https://$MINIKUBEIP:5556/auth?approval_prompt=force&client_id=kubernetes&redirect_uri=urn:ietf:wg:oauth:2.0:oob&response_type=code&scope=openid+email+profile+offline_access+groups
+```
+
+Substitute $AUTHCODE with the one retrieved from the previous step
+```console
+kubectl get configmap dex-dex-ca -n kube-system -o=jsonpath='{.data.dex-ca\.pem}' > /etc/dex-ca.pem
+
+cp -a ~/.kube/config ~/.kube/config.orig
+
+kubectl config set-credentials "minikube" --auth-provider=oidc --auth-provider-arg=client-id=kubernetes --auth-provider-arg=client-secret=$CLIENTCLIPW --auth-provider-arg=idp-issuer-url=https://$MINIKUBEIP:5556 --auth-provider-arg=idp-certificate-authority=/etc/dex-ca.pem --auth-provider-arg=authorization-code=$AUTHCODE
+```
+
+From now on, you can use your cli as normal and it will automatically fetch updated id tokens as needed.

@@ -30,6 +30,8 @@ oidc:
 #    - -http-address
 #    - 0.0.0.0:9090
 #    - -client-id 
+#    - kubernetes-dashboard
+#    - -audience-client-id 
 #    - kubernetes
 #    - -client-secret
 #    - xxxxxxxxxxxxxxxxxxxxxxxx
@@ -49,6 +51,7 @@ oidc:
 #    - -skip-provider-button
 #    - -cookie-secure=false
 #    - -ssl-insecure-skip-verify
+#    - -scope=openid profile email groups audience:server:client_id:kubernetes
 args: []
 
 resources:
