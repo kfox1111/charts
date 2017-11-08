@@ -1,0 +1,29 @@
+kubedhcp:
+  image: tiangolo/uwsgi-nginx-flask
+  imageTag: python3.6
+  replicas: 1
+  cpuRequest: 100m
+  memoryRequest: 20Mi
+  cpuLimit: 100m
+  memoryLimit: 30Mi
+  nodeSelector: {}
+    #key: value
+pdhcp:
+  enabled: true
+  image: kfox1111/dhcp-bridge
+  imageTag: latest
+  cpuRequest: 100m
+  memoryRequest: 20Mi
+  cpuLimit: 100m
+  memoryLimit: 30Mi
+  nodeSelector: {}
+    #key: value
+  svc:
+    enabled: true
+    type: ClusterIP
+    externalIPs: []
+rbac:
+  enabled: false
+  #Only used if rbac disabled.
+  serviceAccount: default
+

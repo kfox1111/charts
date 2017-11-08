@@ -1,0 +1,72 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}-kubedhcp
+  labels:
+    app: {{ template "fullname" . }}
+    svc: kubedhcp
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: {{ .Values.kubedhcp.replicas }}
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}
+      svc: kubedhcp
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+        svc: kubedhcp
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+    spec:
+      {{- if .Values.rbac.enabled }}
+      serviceAccountName: {{ template "fullname" . }}
+      {{- else }}
+      serviceAccountName: {{ .Values.rbac.serviceAccountName }}
+      {{- end }}
+      terminationGracePeriodSeconds: 60
+      {{- if .Values.kubedhcp.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.kubedhcp.nodeSelector | indent 8 }}
+      {{- end }}
+      containers:
+      - image: {{ .Values.kubedhcp.image }}:{{ .Values.kubedhcp.imageTag }}
+        name: main
+        resources:
+          requests:
+            cpu: "{{ .Values.kubedhcp.cpuRequest }}"
+            memory: "{{ .Values.kubedhcp.memoryRequest }}"
+          limits:
+            cpu: "{{ .Values.kubedhcp.cpuLimit }}"
+            memory: "{{ .Values.kubedhcp.memoryLimit }}"
+        readinessProbe:
+          tcpSocket:
+            port: 80
+          failureThreshold: 1
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        livenessProbe:
+          tcpSocket:
+            port: 80
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        volumeMounts:
+        - mountPath: /app/main.py
+          name: server
+          subPath: server.py
+        ports:
+        - containerPort: 80
+          name: http
+      volumes:
+      - name: server
+        configMap:
+          name: {{ template "fullname" . }}-code

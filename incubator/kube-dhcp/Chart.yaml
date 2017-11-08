@@ -1,0 +1,5 @@
+name: kube-dhcp
+version: 0.0.1
+description: Kubernetes based DHCP solution.
+maintainers:
+- name: kfox1111

@@ -1,0 +1,25 @@
+{{- if .Values.pdhcp.svc.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "fullname" . }}-pdhcp
+  labels:
+    app: {{ template "fullname" . }}
+    svc: pdhcp
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ template "fullname" . }}
+    svc: pdhcp
+  ports:
+  - port: 67
+    name: dhcp
+    protocol: UDP
+{{- if ne (len .Values.pdhcp) 0 }}
+  externalIPs:
+{{ toYaml .Values.pdhcp.svc.externalIPs | indent 4 }}
+{{- end }}
+{{- end }}

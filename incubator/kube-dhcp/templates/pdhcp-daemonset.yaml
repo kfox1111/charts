@@ -1,0 +1,64 @@
+{{- if .Values.pdhcp.enabled }}
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: {{ template "fullname" . }}-pdhcp
+  labels:
+    app: {{ template "fullname" . }}
+    svc: pdhcp
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+        svc: pdhcp
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      terminationGracePeriodSeconds: 60
+      hostNetwork: True
+      {{- if .Values.pdhcp.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.pdhcp.nodeSelector | indent 8 }}
+      {{- end }}
+      containers:
+      - image: {{ .Values.pdhcp.image }}:{{ .Values.pdhcp.imageTag }}
+        name: main
+        command:
+        - pdhcp
+        - -api
+        - http://{{ template "fullname" . }}-kubedhcp/mac/
+        resources:
+          requests:
+            cpu: "{{ .Values.pdhcp.cpuRequest }}"
+            memory: "{{ .Values.pdhcp.memoryRequest }}"
+          limits:
+            cpu: "{{ .Values.pdhcp.cpuLimit }}"
+            memory: "{{ .Values.pdhcp.memoryLimit }}"
+        readinessProbe:
+          tcpSocket:
+            port: 9000
+          failureThreshold: 1
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        livenessProbe:
+          tcpSocket:
+            port: 9000
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        ports:
+        - containerPort: 9000
+        - containerPort: 67
+          name: dhcp
+          protocol: UDP
+{{- end }}
