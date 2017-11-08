@@ -5,7 +5,7 @@ metadata:
   name: {{ .Values.type }}
 provisioner: {{ printf "ceph.com/%s" .Values.type | quote }}
 parameters:
-  monitors: "{{- range .Values.monitors }}{{- if not $local.first }},{{ end }}{{ . }}{{ end }}"
+  monitors: "{{- range .Values.monitors }}{{- if not $local.first }},{{ end }}{{ . }}{{- $_ := set $local "first" false }}{{ end }}"
   pool: {{ .Values.pool }}
   adminId: {{ .Values.adminSecret.user }}
   adminSecretName: {{ .Values.adminSecret.name }}

@@ -26,6 +26,15 @@ replicaCount: 1
 hostNetwork: true
 nodeSelector: {}
 
+rbac:
+  ## If true, create & use RBAC resources
+  #
+  create: true
+
+  ## Ignored if rbac.create is true
+  #
+  serviceAccountName: default
+
 adminSecret:
   manage: true
   unwrapped: true
