@@ -27,7 +27,7 @@ def mac_article(mac):
     j = json.load(reader(req))
 
     data = j['spec']
-    data['messageType'] = 2
+    data['msgType'] = 2
     js = json.dumps(data)
 
     resp = Response(js, status=200, mimetype='application/json')
