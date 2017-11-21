@@ -1,7 +1,7 @@
 from flask import Flask, Response
 import os
 import json
-import urllib, urllib.request
+import urllib, urllib.error, urllib.request
 import ssl
 import codecs
 
@@ -10,8 +10,7 @@ app = Flask(__name__)
 ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 ctx.load_verify_locations(cafile='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt')
 
-@app.route('/v1/boot/<mac>')
-def mac_article(mac):
+def get_mac_req(mac):
     f = open('/var/run/secrets/kubernetes.io/serviceaccount/token')
     token = f.readlines()[0]
     f.close()
@@ -23,6 +22,16 @@ def mac_article(mac):
     #print("Going to call %s with %s" %(url, token))
     r = urllib.request.Request(url, None, {'Authorization': "Bearer %s" % token})
     req = urllib.request.urlopen(r, context=ctx)
+    return req
+
+@app.route('/v1/boot/<mac>')
+def mac_article(mac):
+    try:
+        req = get_mac_req(mac)
+    except urllib.error.HTTPError as e:
+        if e.code != 404:
+            raise
+        req = get_mac_req('unknown')
     reader = codecs.getreader("utf-8")
     j = json.load(reader(req))
 
