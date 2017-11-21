@@ -1,0 +1,25 @@
+dependencies:
+  - name: coredns
+    repository: file://charts/coredns
+    version: 0.0.1
+  - name: dhcp
+    repository: file://charts/dhcp
+    version: 0.0.1
+    condition: dhcp.enabled
+  - name: pixiecore
+    repository: file://charts/pixiecore
+    version: 0.0.1
+    condition: pixiecore.enabled
+  - name: kube-pixiecore
+    repository: file://charts/kube-pixiecore
+    version: 0.0.1
+    condition: kube-pixiecore.enabled
+  - name: kube-dhcp-common
+    repository: file://charts/kube-dhcp-common
+    version: 0.0.1
+    condition: kube-dhcp-common.enabled
+  - name: provision-baseos
+    repository: file://provision-baseos
+    version: 0.0.1
+    condition: centos-7-1708-x86-64.enabled
+    alias: centos-7-1708-x86-64

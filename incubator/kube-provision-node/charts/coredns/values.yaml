@@ -1,0 +1,17 @@
+image: coredns/coredns
+imageTag: 0.9.10
+imagePullPolicy: IfNotPresent
+domain: coreprovision.cluster.local
+serial: 1
+l7:
+- name: centos-7-1708-x86_64
+#FIXME this needs to be a proper interface and not an ip...
+interface: 127.0.0.1
+vip: 127.0.0.1
+resources: {}
+dns1IP: 10.0.0.2
+dns2IP: 10.0.0.3
+prometheus:
+  port: 9321
+config:
+  manage: true

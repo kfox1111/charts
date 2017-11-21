@@ -1,0 +1,48 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: {{ template "fullname" . }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      containers:
+      - name: main
+        image: "{{ .Values.image }}:{{ .Values.imageTag }}"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN"]
+        command:
+        - /bin/bash
+        - -c
+        - |
+          brctl addbr dummy \
+          && ip addr add 169.254.169.254 dev dummy \
+          && ip link set dummy up \
+          && dhcpd -d -user daemon -group daemon -s {{ .Values.externalIP }} dummy eth0
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        ports:
+        - containerPort: 67
+          name: dhcp
+          protocol: UDP
+        volumeMounts:
+        - name: config
+          mountPath: /etc/dhcp
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "fullname" . }}
+

@@ -1,0 +1,15 @@
+image: kfox1111/provision-baseos-server
+imageTag: centos-7-1708-x86_64
+imagePullPolicy: IfNotPresent
+replicas: 3
+serviceType: ClusterIP
+httpPort: 80
+externalIPs: []
+# - 192.168.0.2
+cache: true
+nodeSelector: {}
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: coreprovision
+  host: centos-7-1708-x86-64.coreprovision.cluster.local

@@ -1,0 +1,31 @@
+{{- $domain := .Values.domain }}
+{{- if .Values.config.manage }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" . }}
+data:
+  Corefile: |-
+    .:53 {
+        bind {{ .Values.interface }}
+        auto {{ .Values.domain }} {
+            directory /etc/coredns/zones
+        }
+        log stdout
+        errors stdout
+        health
+        prometheus 0.0.0.0:{{ .Values.prometheus.port }}
+    }
+  db.{{ .Values.domain }}: |
+    $ORIGIN {{ .Values.domain }}.
+    $TTL 1h
+    {{ .Values.domain }}.   IN      SOA     ns1.{{ .Values.domain }}. hostmaster.{{ .Values.domain }}. ( {{ .Values.serial }} 1d 2h 4w 1h )
+    {{ .Values.domain }}.   IN      NS      ns1.{{ .Values.domain }}.
+    {{ .Values.domain }}.   IN      NS      ns2.{{ .Values.domain }}.
+    ns1            IN      A       {{ .Values.dns1IP }}
+    ns2            IN      A       {{ .Values.dns2IP }}
+    l7              IN      A       {{ .Values.vip }}
+{{- range .Values.l7 }}
+    {{ .name }}       IN      CNAME   l7.{{ $domain }}.
+{{- end }}
+{{- end }}

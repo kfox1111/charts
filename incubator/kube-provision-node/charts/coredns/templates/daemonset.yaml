@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: {{ template "fullname" . }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      hostNetwork: True
+      containers:
+      - name: main
+        image: "{{ .Values.image }}:{{ .Values.imageTag }}"
+        command: [/coredns, -conf, /etc/coredns/Corefile]
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        ports:
+        - containerPort: 53
+          name: dns-tcp
+          protocol: TCP
+        - containerPort: 53
+          name: dns-udp
+          protocol: UDP
+        volumeMounts:
+        - name: config
+          mountPath: /etc/coredns
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "fullname" . }}
+          items:
+          - key: db.{{ .Values.domain }}
+            path: zones/db.{{ .Values.domain }}
+          - key: Corefile
+            path: Corefile

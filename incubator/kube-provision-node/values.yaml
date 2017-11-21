@@ -1,0 +1,53 @@
+coredns:
+    domain: coreprovision.cluster.local
+    serial: 1
+    l7:
+    - name: centos-7-1708-x86-64
+    #FIXME this needs to be a proper interface and not an ip...
+    interface: 127.0.0.1
+    vip: 127.0.0.1
+    dns1IP: 10.0.0.2
+    dns2IP: 10.0.0.3
+
+centos-7-1708-x86-64:
+    enabled: true
+    replicas: 3
+    annotations:
+#FIXME
+        kubernetes.io/ingress.class: coreprovision
+    host: centos-7-1708-x86-64.coreprovision.cluster.local
+
+dhcp:
+    enabled: true
+
+nginx-ingress:
+    controller:
+      name: controller
+      extraArgs:
+        ingress-class: coreprovision
+      scope:
+        enabled: true
+        namespace: "kube-provision-node"
+      kind: Deployment
+      nodeSelector: {}
+#       controller: v1
+      service:
+        type: ClusterIP
+        externalIPs:
+        - "changeme" # Set...
+    defaultBackend:
+      enabled: true
+      name: default-backend
+      nodeSelector: {}
+#       controller: v1
+      replicaCount: 3
+
+pixiecore:
+  enabled: true
+
+kube-dhcp-common:
+  enabled: false
+
+kube-pixiecore:
+  enabled: true
+  serviceName: pixiecore

@@ -1,0 +1,6 @@
+name: provision-baseos
+version: 0.0.1
+description: Server containing baseos components
+maintainers:
+- name: Kevin Fox
+  email: Kevin.Fox@pnnl.gov

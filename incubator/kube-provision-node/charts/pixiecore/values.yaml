@@ -1,0 +1,4 @@
+image: danderson/pixiecore
+imageTag: latest
+imagePullPolicy: IfNotPresent
+service: http://pixiecore

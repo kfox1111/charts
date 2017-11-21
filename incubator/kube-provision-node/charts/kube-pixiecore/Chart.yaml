@@ -1,0 +1,5 @@
+name: kube-pixiecore
+version: 0.0.1
+description: Kubernetes backed pixiecore server
+maintainers:
+- name: kfox1111

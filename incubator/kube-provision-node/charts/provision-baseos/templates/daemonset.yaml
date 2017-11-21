@@ -1,0 +1,26 @@
+{{- if .Values.cache }}
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: {{ template "fullname" . }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      containers:
+      - name: cache
+        image: "{{ .Values.image }}:{{ .Values.imageTag }}"
+        command: [/bin/sh, -c, 'while true; do sleep 10000; done']
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
+{{- end }}
