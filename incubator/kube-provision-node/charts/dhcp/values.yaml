@@ -1,31 +1,30 @@
 image: kfox1111/dhcp
 imageTag: 4.2.5-58.el7.centos-2
 imagePullPolicy: IfNotPresent
-replicas: 1
 serviceType: ClusterIP
-dhcpPort: 67
-externalIP: 192.168.0.2
 resources: {}
+interfaces: []
 
 config:
     manage: true
-    domainName: example.com
-    domainNameServers: [4.2.2.2, 4.2.2.5, 4.2.2.6]
 
     defaultLeaseTime: 600
     maxLeaseTime: 7200
-
     ddnsUpdateStyle: none
 
     subnets:
       - start: 172.22.0.0
         netmask: 255.255.255.0
-        routers: 172.22.0.1
 #FIXME rangeStart/End should not be used until pv support is added.
 #        rangeStart: 192.168.0.100
 #        rangeEnd: 192.168.0.254
-
-    hosts:
+    #NOTE this is temporary until kube-dhcp is done. This info should be in k8s itself.
+    groups:
+    - domainName: example.com
+      domainNameServers: [172.22.0.1]
+      routers: [172.22.0.1]
+      subnetMask: 255.255.255.0
+      hosts:
       - name: c1
         mac: 00:01:02:aa:bb:cc
         ip: 172.22.0.2

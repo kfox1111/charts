@@ -5,32 +5,31 @@ metadata:
   name: {{ template "fullname" . }}
 data:
   dhcpd.conf: |
-    option domain-name "{{ .Values.config.domainName }}";
-    option domain-name-servers {{ join ", " .Values.config.domainNameServers }};
-
     default-lease-time {{ .Values.config.defaultLeaseTime }};
     max-lease-time {{ .Values.config.maxLeaseTime }};
 
     ddns-update-style {{ .Values.config.ddnsUpdateStyle }};
-
-    #Dummy subnet so it will start. We need udp for relay only.
-    subnet 169.254.169.254 netmask 255.255.255.255 { }
-    subnet 172.17.0.0 netmask 255.255.0.0 { }
-    subnet 10.99.0.0 netmask 255.255.255.0 { }
 
 {{- range .Values.config.subnets }}
     subnet {{ .start }} netmask {{ .netmask }} {
 {{- if hasKey . "rangeStart" }}
       range {{ .rangeStart }} {{ .rangeEnd }};
 {{- end }}
-      option routers {{ .routers }};
     }
 {{- end }}
 
-{{- range .Values.config.hosts }}
-    host {{ .name }} {
-      hardware ethernet {{ .mac }};
-      fixed-address {{ .ip }};
+{{- range .Values.config.groups }}
+    group {
+      option routers {{ join ", " .routers }};
+      option domain-name "{{ .domainName }}";
+      option domain-name-servers {{ join ", " .domainNameServers }};
+      option subnet-mask {{ join ", " .subnetMask }};
+{{- range .hosts }}
+      host {{ .name }} {
+        hardware ethernet {{ .mac }};
+        fixed-address {{ .ip }};
+      }
     }
+{{- end }}
 {{- end }}
 {{- end }}

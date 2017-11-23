@@ -9,6 +9,9 @@ coredns:
     dns1IP: 10.0.0.2
     dns2IP: 10.0.0.3
 
+config-engine:
+  serviceName: config-engine
+
 centos-7-1708-x86-64:
     enabled: true
     replicas: 3
@@ -19,6 +22,7 @@ centos-7-1708-x86-64:
 
 dhcp:
     enabled: true
+    interfaces: []
 
 nginx-ingress:
     controller:
@@ -47,6 +51,9 @@ pixiecore:
 
 kube-dhcp-common:
   enabled: false
+
+kube-config-store:
+  serviceName: kube-config-store
 
 kube-pixiecore:
   enabled: true

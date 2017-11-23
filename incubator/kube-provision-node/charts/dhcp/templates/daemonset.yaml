@@ -1,5 +1,5 @@
 apiVersion: extensions/v1beta1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: {{ template "fullname" . }}
   labels:
@@ -8,15 +8,12 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
     app: {{ template "fullname" . }}
 spec:
-  replicas: {{ .Values.replicas }}
-  selector:
-    matchLabels:
-      app: {{ template "fullname" . }}
   template:
     metadata:
       labels:
         app: {{ template "fullname" . }}
     spec:
+      hostNetwork: true
       containers:
       - name: main
         image: "{{ .Values.image }}:{{ .Values.imageTag }}"
@@ -28,16 +25,14 @@ spec:
         - /bin/bash
         - -c
         - |
-          brctl addbr dummy \
-          && ip addr add 169.254.169.254 dev dummy \
-          && ip link set dummy up \
-          && dhcpd -d -user daemon -group daemon -s {{ .Values.externalIP }} dummy eth0
+          dhcpd -d -user daemon -group daemon {{ join " " .Values.interfaces }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
-        ports:
-        - containerPort: 67
-          name: dhcp
-          protocol: UDP
+#FIXME this and pixiecore block each other....
+#       ports:
+#       - containerPort: 67
+#         name: dhcp
+#         protocol: UDP
         volumeMounts:
         - name: config
           mountPath: /etc/dhcp
