@@ -24,6 +24,12 @@ kindMap = {
           {"func": "replace", "in": ":", "out": "-"}
         ]
     },
+    'machine': {
+        'version': "v1",
+        'api': "kubeprovision.github.com",
+        'namespace': "default",
+        'kind': "machines"
+    },
     'baseos': {
         'version': "v1",
         'api': "kubeprovision.github.com",

@@ -6,12 +6,20 @@ import ssl
 import codecs
 import collections
 import jsonpatch
+import jsonpointer
 
 app = Flask(__name__)
 
 ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 #FIXME This should be made a config file option...
 #ctx.load_verify_locations(cafile='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt')
+
+#FIXME make this a configfile thing.
+engineConfig = {
+    'configStore': {
+        'url': "http://kube-config-store"
+    }
+}
 
 def union(d, u):
     for k, v in u.items():
@@ -21,12 +29,15 @@ def union(d, u):
             d[k] = v
     return d
 
-#FIXME make this a configfile thing.
-engineConfig = {
-    'configStore': {
-        'url': "http://kube-config-store"
-    }
-}
+def tags_match(requested_tag, specified_tags):
+    if isinstance(specified_tags, str):
+        if specified_tags == 'default' or specified_tags == requested_tag:
+            return True
+    else:
+        if requested_tag in specified_tags:
+            return True
+    return False
+
 
 def get_cs_data(group, name):
     url = "%s/v1/%s/%s" % (engineConfig['configStore']['url'], group, name)
@@ -37,53 +48,39 @@ def get_cs_data(group, name):
     data = json.load(reader(req))
     return data
 
-def engine_match(enginekind, name):
-    if isinstance(name, str):
-        if name == 'default' or name == enginekind:
-            return True
-    else:
-        if enginekind in name:
-            return True
-    return False
+def get_ce_doc(data, requested_tag, kind, name):
+    doc_data = get_cs_data(kind, name)
+    for t in doc_data['config']:
+        if tags_match(requested_tag, t['tags']):
+           for op in t['ops']:
+               dst_data = data
+               dst_path = ""
+               if 'dstPath' in op:
+                   dst_path = op['dstPath']
+               if dst_path and dst_path != "":
+                   dst_data = jsonpointer.resolve_pointer(data, dst_path) 
+               if 'include' in op:
+                   #FIXME if we want to support srcSath, here's where to do it.
+                   key = list(op['include'].keys())[0]
+                   dst_data = get_ce_doc(dst_data, requested_tag, key, op['include'][key])
+               elif 'set' in op:
+                   #FIXME we can implement op['merger'] = overwrite (current, default), keep, failifset, arrayzipper, etc.
+                   union(dst_data, op['set'])
+               elif 'jsonPatch' in op:
+                   patch = jsonpatch.JsonPatch.from_string(json.dumps(op['jsonPatch']))
+                   dst_data = patch.apply(dst_data)
+               if dst_path and dst_path != "":
+                   jsonpointer.set_pointer(data, dst_path, dst_data)
+               else:
+                   data = dst_data
+    return data
 
-def process_doc(data_list, data, kind):
-    data_list.insert(0, data)
-    # Walk default and kind entries (dhcps). get all includes and pull each document.
-    for t in data['config']:
-        if engine_match(kind, t['name']):
-           if 'include' in t:
-               for g in t['include']:
-                   d = get_cs_data(g['name'], g['value'])
-                   process_doc(data_list, d, kind)
+@app.route('/v1/<tags>/<kind>/<name>')
+def get_ce(tags, kind, name):
+    data = {}
+    data = get_ce_doc(data, tags, kind, name)
 
-def process_union_data(built_data, data, kind):
-    for t in data['config']:
-        if engine_match(kind, t['name']):
-           if 'set' in t:
-               #FIXME we can implement t['set']['merger'] = overwrite (current), failifset, arrayzipper, etc.
-               union(built_data, t['set']['data'])
-           if 'jsonPatch' in t:
-               patch = jsonpatch.JsonPatch.from_string(json.dumps(t['jsonPatch']))
-               built_data = patch.apply(built_data)
-    return built_data
-
-@app.route('/v1/<enginekind>/<kind>/<name>')
-def get_ce(enginekind, kind, name):
-
-    data = get_cs_data(kind, name)
-
-    data_list = []
-
-    # Include all include data in the list.
-    process_doc(data_list, data, enginekind)
-
-    built_data = {}
-    # Walk all the downloaded lists and find all the enginekind entries
-    for d in data_list:
-        built_data = process_union_data(built_data, d, 'default')
-        built_data = process_union_data(built_data, d, enginekind)
-
-    js = json.dumps(built_data)
+    js = json.dumps(data)
 
     resp = Response(js, status=200, mimetype='application/json')
 

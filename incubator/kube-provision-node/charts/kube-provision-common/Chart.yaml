@@ -1,0 +1,6 @@
+name: kube-provision-common
+version: 0.0.1
+description: common objects used by all kube-provision instances
+maintainers:
+- name: Kevin Fox
+  email: Kevin.Fox@pnnl.gov
