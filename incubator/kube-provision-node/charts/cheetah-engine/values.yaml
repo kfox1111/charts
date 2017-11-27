@@ -1,0 +1,20 @@
+image: tiangolo/uwsgi-nginx-flask
+imageTag: python3.6
+replicas: 1
+cpuRequest: 100m
+memoryRequest: 20Mi
+cpuLimit: 100m
+memoryLimit: 30Mi
+nodeSelector: {}
+  #key: value
+httpPort: 80
+serviceName:
+#FIXME implement rbac
+rbac:
+  enabled: false
+  serviceAccountName: default
+ingress:
+  enabled: true
+  annotations: {}
+  host: cheetah-engine.coreprovision.cluster.local
+

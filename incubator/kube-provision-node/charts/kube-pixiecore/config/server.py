@@ -28,12 +28,14 @@ def get_boot(mac):
                 l.append(i)
             else:
                 for j in i:
-                    print(j, i[j])
-                    if i[j].find(' ') != -1:
+                    value = i[j]
+                    if isinstance(value, (list, tuple)):
+                        value = ''.join(value)
+                    if value.find(' ') != -1:
                         # FIXME can you escape "'s?
-                        l.append("%s=\"%s\"" %(j, i[j]))
+                        l.append("%s=\"%s\"" %(j, value))
                     else:
-                        l.append("%s=%s" %(j, i[j]))
+                        l.append("%s=%s" %(j, value))
         data['cmdline'] = ' '.join(l)
 
     js = json.dumps(data)

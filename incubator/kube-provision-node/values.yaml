@@ -3,6 +3,7 @@ coredns:
     serial: 1
     l7:
     - name: centos-7-1708-x86-64
+    - name: cheetah-engine
     #FIXME this needs to be a proper interface and not an ip...
     interface: 127.0.0.1
     vip: 127.0.0.1
@@ -15,10 +16,21 @@ config-engine:
 centos-7-1708-x86-64:
     enabled: true
     replicas: 3
-    annotations:
+    ingress:
+        host: centos-7-1708-x86-64.coreprovision.cluster.local
+        annotations:
 #FIXME
-        kubernetes.io/ingress.class: coreprovision
-    host: centos-7-1708-x86-64.coreprovision.cluster.local
+            kubernetes.io/ingress.class: coreprovision
+
+cheetah-engine:
+    enabled: true
+    replicas: 3
+    ingress:
+        host: cheetah-engine.coreprovision.cluster.local
+        annotations:
+#FIXME
+            kubernetes.io/ingress.class: coreprovision
+
 
 dhcp:
     enabled: true

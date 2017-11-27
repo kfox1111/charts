@@ -1,0 +1,17 @@
+{{- $name := default (include "fullname" .) .Values.serviceName }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  labels:
+    app: {{ template "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ template "fullname" . }}
+  ports:
+  - port: 80
+    name: http

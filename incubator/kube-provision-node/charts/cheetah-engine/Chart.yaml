@@ -1,0 +1,5 @@
+name: cheetah-engine
+version: 0.0.1
+description: Template engine based on python based Cheetah
+maintainers:
+- name: kfox1111

@@ -30,6 +30,12 @@ kindMap = {
         'namespace': "default",
         'kind': "machines"
     },
+    'template': {
+        'version': "v1",
+        'api': "kubeprovision.github.com",
+        'namespace': "default",
+        'kind': "kpntemplates"
+    },
     'baseos': {
         'version': "v1",
         'api': "kubeprovision.github.com",
