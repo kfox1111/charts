@@ -1,6 +1,7 @@
 from flask import Flask, Response
 import os
 import json
+import yaml
 import urllib, urllib.error, urllib.request
 import ssl
 import codecs
@@ -10,39 +11,7 @@ app = Flask(__name__)
 ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 ctx.load_verify_locations(cafile='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt')
 
-#FIXME make this a configmap
-kindMap = {
-    'dhcp': {
-        'fallback': 'mac-unknown',
-        'version': "v1",
-        'api': "kubedhcp.github.com",
-        'namespace': "default",
-        'kind': "dhcps",
-        'namePrefix': "mac",
-        'nameManip': [
-          "lower",
-          {"func": "replace", "in": ":", "out": "-"}
-        ]
-    },
-    'machine': {
-        'version': "v1",
-        'api': "kubeprovision.github.com",
-        'namespace': "default",
-        'kind': "machines"
-    },
-    'template': {
-        'version': "v1",
-        'api': "kubeprovision.github.com",
-        'namespace': "default",
-        'kind': "kpntemplates"
-    },
-    'baseos': {
-        'version': "v1",
-        'api': "kubeprovision.github.com",
-        'namespace': "default",
-        'kind': "baseoses"
-    }
-}
+kindMap = yaml.load(open('/etc/config-store.yaml'))
 
 def get_kind_req(kind, name=""):
     f = open('/var/run/secrets/kubernetes.io/serviceaccount/token')

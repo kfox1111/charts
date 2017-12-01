@@ -1,0 +1,69 @@
+apiVersion: "kubeprovision.github.com/v1"
+kind: Template
+metadata:
+  name: kickstart
+spec:
+  config:
+  - tags: template
+    ops:
+    - set:
+        packages: []
+        template: |
+            #for $command in $commands
+            #set str = ""
+            #set $v = $commands[$command]
+            #if "args" in $v
+            #set $args = $v["args"]
+            #for $arg in $args
+            #if $args[$arg] is None
+            #set str += " --" + $arg
+            #else
+            #set str += " --" + $arg + "=" + $args[$arg]
+            #end if
+            #end for
+            #end if
+            #if "opts" in $v
+            #set $opts = $v["opts"]
+            #for $opt in $opts
+            #set str += " " + $opt
+            #end for
+            #end if
+            $command$str
+            #end for
+            
+            %pre
+            set -x
+            $snippets.pre
+            %end
+            
+            %packages --nobase
+            #for $package in $packages
+            $package
+            #end for
+            %end
+            
+            %post
+            set -x
+            $snippets.post
+            %end
+        snippets:
+            pre: ""
+            post: ""
+        commands:
+            url: {"args": {"url": "http://centos-7-1708-x86-64.coreprovision.cluster.local/"}}
+            # FIXME need repo list...
+            # the crypted password here is changeme. You should change it.
+            rootpw: {"args": {"iscrypted": null}, "opts":["$6$ZNkCGLWx2s.Fpj57$4J2/sNIpX3XF6ON4zOTwne.48o3.SIC1mfn2xo8Y8y8IYSSDkqvGLs9OxGNsUhhXcyIVDe6/caVBM0RC/Ulnw0"]}
+            auth: {"args": {"enableshadow": null, passalgo: sha512}}
+            text: {}
+            firstboot: {"args": {"disable": null}}
+            keyboard: {"opts": ["us"]}
+            lang: {"opts": ["en_US"]}
+            firewall: {"args": {"enabled": null}}
+            services: {"args": {"enabled":"sshd"}}
+            timezone: {"opts": ["America/Los_Angeles"]}
+            eula: {args: {agreed: null}}
+            reboot: {}
+            selinux: {"args": {"disabled": null}}
+            bootloader: {"args": {"location": "mbr"}}
+            clearpart: {"args": {"all": null, "initlabel": null}}

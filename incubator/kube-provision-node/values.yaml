@@ -22,6 +22,9 @@ centos-7-1708-x86-64:
 #FIXME
             kubernetes.io/ingress.class: coreprovision
 
+reference-templates:
+    enabled: true
+
 cheetah-engine:
     enabled: true
     replicas: 3
@@ -60,9 +63,6 @@ nginx-ingress:
 
 pixiecore:
   enabled: true
-
-kube-dhcp-common:
-  enabled: false
 
 kube-config-store:
   serviceName: kube-config-store

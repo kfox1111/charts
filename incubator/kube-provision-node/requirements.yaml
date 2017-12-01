@@ -23,3 +23,7 @@ dependencies:
     version: 0.0.1
     condition: centos-7-1708-x86-64.enabled
     alias: centos-7-1708-x86-64
+  - name: reference-templates
+    repository: file://reference-templates
+    version: 0.0.1
+    condition: reference-templates.enabled

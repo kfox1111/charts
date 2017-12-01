@@ -33,6 +33,13 @@ spec:
       containers:
       - image: {{ .Values.image }}:{{ .Values.imageTag }}
         name: main
+        command:
+        - /bin/bash
+        - -c
+#FIXME we probably should build a proper container with this dep in it.
+        - |
+          pip install pyyaml
+          exec /entrypoint.sh /usr/bin/supervisord
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         readinessProbe:
@@ -55,6 +62,9 @@ spec:
         - mountPath: /app/main.py
           name: server
           subPath: server.py
+        - mountPath: /etc/config-store.yaml
+          name: config
+          subPath: config.yaml
         ports:
         - containerPort: 80
           name: http
@@ -62,3 +72,6 @@ spec:
       - name: server
         configMap:
           name: {{ template "fullname" . }}-code
+      - name: config
+        configMap:
+          name: {{ template "fullname" . }}

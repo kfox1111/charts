@@ -1,12 +1,38 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "fullname" . }}-code
+  name: {{ template "fullname" . }}
   labels:
     app: {{ template "fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
 data:
-  server.py: |
-{{ .Files.Get "config/server.py" | indent 4 }}
+  config.yaml: |
+    dhcp:
+        fallback: mac-unknown
+        version: v1
+        api: kubedhcp.github.com
+        namespace: {{ .Release.Namespace }}
+        kind: dhcps
+        namePrefix: mac
+        nameManip:
+        - lower
+        - func: replace
+          in: ":"
+          out: "-"
+    machine:
+        version: v1
+        api: kubeprovision.github.com
+        namespace: {{ .Release.Namespace }}
+        kind: kpnmachines
+    template:
+        version: v1
+        api: kubeprovision.github.com
+        namespace: {{ .Release.Namespace }}
+        kind: kpntemplates
+    baseos:
+        version: v1
+        api: kubeprovision.github.com
+        namespace: {{ .Release.Namespace }}
+        kind: kpnbaseoses

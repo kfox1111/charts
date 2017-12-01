@@ -1,0 +1,19 @@
+apiVersion: "kubeprovision.github.com/v1"
+kind: BaseOS
+metadata:
+  name: centos-7-1708-x86-64
+spec:
+  config:
+  - tags: pxe
+    ops:
+    - set:
+#FIXME template out these strings.
+        kernel: "http://kube-provision-node-centos-7-1708-x86-64/images/pxeboot/vmlinuz"
+        initrd:
+        - "http://kube-provision-node-centos-7-1708-x86-64/images/pxeboot/initrd.img"
+        cmdline:
+        - ks: ["http://cheetah-engine.coreprovision.cluster.local", /v1/, default]
+        - text
+        - inst.repo: "http://centos-7-1708-x86-64.coreprovision.cluster.local/"
+        - inst.stage2: "http://centos-7-1708-x86-64.coreprovision.cluster.local/"
+        - console: tty0
