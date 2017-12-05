@@ -8,6 +8,9 @@ metadata:
     component: "{{ .Values.controller.name }}"
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
+    {{- if .Values.controller.extraLabels }}
+{{ toYaml .Values.controller.extraLabels | indent 4}}
+    {{- end }}
   name: {{ template "nginx-ingress.controller.fullname" . }}
 spec:
   template:
@@ -21,6 +24,9 @@ spec:
         app: {{ template "nginx-ingress.name" . }}
         component: "{{ .Values.controller.name }}"
         release: {{ .Release.Name }}
+        {{- if .Values.controller.extraLabels }}
+{{ toYaml .Values.controller.extraLabels | indent 8}}
+        {{- end }}
     spec:
       containers:
         - name: {{ template "nginx-ingress.name" . }}-{{ .Values.controller.name }}

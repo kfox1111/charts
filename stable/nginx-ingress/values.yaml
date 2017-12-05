@@ -54,6 +54,8 @@ controller:
 
   extraArgs: {}
 
+  extraLabels: {}
+
   ## DaemonSet or Deployment
   ##
   kind: Deployment
