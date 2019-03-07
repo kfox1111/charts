@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "generic-three-tier.backend.fullname" . }}
+  labels:
+    app: {{ template "generic-three-tier.name" . }}
+    chart: {{ template "generic-three-tier.chart" . }}
+    release: {{ .Release.Name }}
+    component: backend
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "generic-three-tier.name" . }}
+      release: {{ .Release.Name }}
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: {{ template "generic-three-tier.name" . }}
+        release: {{ .Release.Name }}
+        component: backend
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+{{ toYaml .Values.backend.resources | indent 12 }}
+    {{- with .Values.backend.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.backend.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.backend.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
