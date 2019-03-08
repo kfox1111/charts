@@ -3,20 +3,23 @@
 # Declare variables to be passed into your templates.
 frontend:
 
-  secrets: []
-  # - name: key
-  #   content: secret data here
-
-  configMountPath: /etc/frontend
-  config: []
-  # - name: key
-  #   content: non secret data here
+  secrets:
+    simpleMountPath: /etc/frontend-secret
+    advancedMounts: []
+    #- mountPath: /etc/nginx/nginx.key
+    #  subPath: nginx.key
+    data: []
+    #- name: nginx.key
+    #  content: secret data here
 
   config:
-    mountPath: /etc/frontend
-    entries:
-    - name: key
-      content: non secret data here
+    simpleMountPath: /etc/frontend
+    advancedMounts: []
+    #- mountPath: /etc/nginx/nginx.conf
+    #  subPath: nginx.conf
+    data:
+    - name: nginx.conf
+      content: non secret frontend data here
 
   replicaCount: 1
   
@@ -62,13 +65,23 @@ frontend:
 
 backend:
 
-  secrets: []
-  # - name: key
-  #   content: secret data here
+  secrets:
+    simpleMountPath: /etc/backend-secret
+    advancedMounts: []
+    #- mountPath: /etc/nginx/nginx.key
+    #  subPath: nginx.key
+    data: []
+    #- name: nginx.key
+    #  content: secret data here
 
-  config: []
-  # - name: key
-  #   content: non secret data here
+  config:
+    simpleMountPath: /etc/backend
+    advancedMounts: []
+    #- mountPath: /etc/nginx/nginx.conf
+    #  subPath: nginx.conf
+    data:
+    - name: nginx.conf
+      content: non secret backend data here
   
   replicaCount: 1
   

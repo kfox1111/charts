@@ -39,8 +39,28 @@ spec:
               path: /
               port: http
           volumeMounts:
+{{- if gt (len .Values.frontend.config.data) 0 }}
+{{- if gt (len .Values.frontend.config.advancedMounts) 0 }}
+{{- range .Values.frontend.config.advancedMounts }}
             - name: config
-              mountPath: {{ .Values.frontend.secretMountPath }}
+{{ toYaml . | indent 14 }}
+{{- end }}
+{{- else }}
+            - name: config
+              mountPath: {{ .Values.frontend.config.simpleMountPath }}
+{{- end }}
+{{- end }}
+{{- if gt (len .Values.frontend.secrets.data) 0 }}
+{{- if gt (len .Values.frontend.secrets.advancedMounts) 0 }}
+{{- range .Values.frontend.secrets.advancedMounts }}
+            - name: secrets
+{{ toYaml . | indent 14 }}
+{{- end }}
+{{- else }}
+            - name: secrets
+              mountPath: {{ .Values.frontend.secrets.simpleMountPath }}
+{{- end }}
+{{- end }}
           resources:
 {{ toYaml .Values.frontend.resources | indent 12 }}
     {{- with .Values.frontend.nodeSelector }}
@@ -56,6 +76,13 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
       volumes:
+{{- if gt (len .Values.frontend.config.data) 0 }}
         - name: config
           configMap:
-            name: {{- $fullName := include "generic-three-tier.frontend.fullname" . -}}
+            name: {{ include "generic-three-tier.frontend.fullname" . -}}
+{{- end }}
+{{- if gt (len .Values.frontend.secrets.data) 0 }}
+        - name: secrets
+          secret:
+            secretName: {{ include "generic-three-tier.frontend.fullname" . -}}
+{{- end }}

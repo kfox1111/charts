@@ -1,0 +1,24 @@
+{{- $global := . }}
+{{- range (list "frontend" "backend") }}
+{{- $section := (index $global.Values .) }}
+{{- if gt (len $section.config.data) 0 }}
+---
+{{- $fullNameKey := printf "generic-three-tier.%s.fullname" . }}
+{{- $fullName := include $fullNameKey $global }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: {{ template "generic-three-tier.name" $global }}
+    chart: {{ template "generic-three-tier.chart" $global }}
+    release: {{ $global.Release.Name }}
+    component: {{ . }}
+    heritage: {{ $global.Release.Service }}
+  name: {{ $fullName }}
+data:
+{{- range $section.config.data }}
+  {{ .name }}: |
+{{ .content | indent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}
