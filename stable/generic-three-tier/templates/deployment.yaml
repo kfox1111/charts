@@ -1,0 +1,95 @@
+{{- $global := . }}
+{{- range (list "frontend" "backend") }}
+{{- $section := (index $global.Values .) }}
+---
+{{- $fullNameKey := printf "generic-three-tier.%s.fullname" . }}
+{{- $fullName := include $fullNameKey $global }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}
+  labels:
+    app: {{ template "generic-three-tier.name" $global }}
+    chart: {{ template "generic-three-tier.chart" $global }}
+    release: {{ $global.Release.Name }}
+    component: {{ . }}
+    heritage: {{ $global.Release.Service }}
+spec:
+  replicas: {{ $section.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "generic-three-tier.name" $global }}
+      release: {{ $global.Release.Name }}
+      component: {{ . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "generic-three-tier.name" $global }}
+        release: {{ $global.Release.Name }}
+        component: {{ . }}
+    spec:
+      containers:
+        - name: {{ $fullName }}
+          image: "{{ $section.image.repository }}:{{ $section.image.tag }}"
+          imagePullPolicy: {{ $section.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          volumeMounts:
+{{- if gt (len $section.config.data) 0 }}
+{{- if gt (len $section.config.advancedMounts) 0 }}
+{{- range $section.config.advancedMounts }}
+            - name: config
+{{ toYaml . | indent 14 }}
+{{- end }}
+{{- else }}
+            - name: config
+              mountPath: {{ $section.config.simpleMountPath }}
+{{- end }}
+{{- end }}
+{{- if gt (len $section.secrets.data) 0 }}
+{{- if gt (len $section.secrets.advancedMounts) 0 }}
+{{- range $section.secrets.advancedMounts }}
+            - name: secrets
+{{ toYaml . | indent 14 }}
+{{- end }}
+{{- else }}
+            - name: secrets
+              mountPath: {{ $section.secrets.simpleMountPath }}
+{{- end }}
+{{- end }}
+          resources:
+{{ toYaml $section.resources | indent 12 }}
+    {{- with $section.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with $section.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with $section.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      volumes:
+{{- if gt (len $section.config.data) 0 }}
+        - name: config
+          configMap:
+            name: {{ include "generic-three-tier.name" $global -}}
+{{- end }}
+{{- if gt (len $section.secrets.data) 0 }}
+        - name: secrets
+          secret:
+            secretName: {{ include "generic-three-tier.name" $global -}}
+{{- end }}
+{{- end }}

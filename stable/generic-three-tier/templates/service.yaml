@@ -1,0 +1,28 @@
+{{- $global := . }}
+{{- range (list "frontend" "backend") }}
+{{- $section := (index $global.Values .) }}
+---
+{{- $fullNameKey := printf "generic-three-tier.%s.fullname" . }}
+{{- $fullName := include $fullNameKey $global }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}
+  labels:
+    app: {{ template "generic-three-tier.name" $global }}
+    chart: {{ template "generic-three-tier.chart" $global }}
+    release: {{ $global.Release.Name }}
+    component: {{ . }}
+    heritage: {{ $global.Release.Service }}
+spec:
+  type: {{ $section.service.type }}
+  ports:
+    - port: {{ $section.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "generic-three-tier.name" $global }}
+    release: {{ $global.Release.Name }}
+    component: {{ . }}
+{{- end }}
