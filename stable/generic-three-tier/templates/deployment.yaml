@@ -36,10 +36,14 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+{{- if gt (len $section.livenessProbe) 0 }}
           livenessProbe:
 {{ toYaml $section.livenessProbe | indent 12 }}
+{{- end }}
+{{- if gt (len $section.readinessProbe) 0 }}
           readinessProbe:
 {{ toYaml $section.readinessProbe | indent 12 }}
+{{- end }}
           env:
 {{ toYaml $section.env | indent 12 }}
           volumeMounts:
