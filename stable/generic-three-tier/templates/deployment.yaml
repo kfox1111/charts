@@ -34,7 +34,7 @@ spec:
           imagePullPolicy: {{ $section.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: {{ $section.service.port }}
               protocol: TCP
 {{- if gt (len $section.livenessProbe) 0 }}
           livenessProbe:
