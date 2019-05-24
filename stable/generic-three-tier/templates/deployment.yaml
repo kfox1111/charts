@@ -44,6 +44,8 @@ spec:
             httpGet:
               path: /
               port: http
+          env:
+{{ toYaml $section.env | indent 12 }}
           volumeMounts:
 {{- if gt (len $section.config.data) 0 }}
 {{- if gt (len $section.config.advancedMounts) 0 }}
