@@ -85,11 +85,11 @@ spec:
 {{- if gt (len $section.config.data) 0 }}
         - name: config
           configMap:
-            name: {{ include "generic-three-tier.name" $global -}}
+            name: {{ $fullNameKey }}
 {{- end }}
 {{- if gt (len $section.secrets.data) 0 }}
         - name: secrets
           secret:
-            secretName: {{ include "generic-three-tier.name" $global -}}
+            secretName: {{ $fullNameKey }}
 {{- end }}
 {{- end }}

@@ -17,9 +17,9 @@ frontend:
     advancedMounts: []
     #- mountPath: /etc/nginx/nginx.conf
     #  subPath: nginx.conf
-    data:
-    - name: nginx.conf
-      content: non secret frontend data here
+    data: []
+    #- name: nginx.conf
+    #  content: non secret frontend data here
 
   replicaCount: 1
 
@@ -80,9 +80,9 @@ backend:
     advancedMounts: []
     #- mountPath: /etc/nginx/nginx.conf
     #  subPath: nginx.conf
-    data:
-    - name: nginx.conf
-      content: non secret backend data here
+    data: []
+    #- name: nginx.conf
+    #  content: non secret backend data here
 
   replicaCount: 1
 
