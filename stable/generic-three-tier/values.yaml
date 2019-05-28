@@ -21,7 +21,7 @@ frontend:
     #- name: nginx.conf
     #  content: non secret frontend data here
 
-  replicaCount: 1
+  replicas: 1
 
   image:
     repository: nginx
@@ -89,7 +89,7 @@ backend:
     #- name: nginx.conf
     #  content: non secret backend data here
 
-  replicaCount: 1
+  replicas: 1
 
   image:
     repository: nginx

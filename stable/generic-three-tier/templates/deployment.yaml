@@ -15,7 +15,7 @@ metadata:
     component: {{ . }}
     heritage: {{ $global.Release.Service }}
 spec:
-  replicas: {{ $section.replicaCount }}
+  replicas: {{ $section.replicas }}
   selector:
     matchLabels:
       app: {{ template "generic-three-tier.name" $global }}
