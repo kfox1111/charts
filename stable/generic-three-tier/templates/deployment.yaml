@@ -44,8 +44,10 @@ spec:
           readinessProbe:
 {{ toYaml $section.readinessProbe | indent 12 }}
 {{- end }}
+{{- if gt (len $section.env) 0 }}
           env:
 {{ toYaml $section.env | indent 12 }}
+{{- end }}
           volumeMounts:
 {{- if gt (len $section.config.data) 0 }}
 {{- if gt (len $section.config.advancedMounts) 0 }}
