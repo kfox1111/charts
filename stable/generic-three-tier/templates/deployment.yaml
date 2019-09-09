@@ -49,6 +49,9 @@ spec:
 {{ toYaml $section.env | indent 12 }}
 {{- end }}
           volumeMounts:
+{{- if gt (len $section.volumeMounts) 0 }}
+{{ toYaml $section.volumeMounts | indent 12 }}
+{{- end }}
 {{- if gt (len $section.config.data) 0 }}
 {{- if gt (len $section.config.advancedMounts) 0 }}
 {{- range $section.config.advancedMounts }}
@@ -86,6 +89,9 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
       volumes:
+{{- if gt (len $section.volumes) 0 }}
+{{ toYaml $section.volumes | indent 8 }}
+{{- end }}
 {{- if gt (len $section.config.data) 0 }}
         - name: config
           configMap:
